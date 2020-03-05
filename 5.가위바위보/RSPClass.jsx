@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
 
 const rspCoords = {
     바위: '0',
@@ -18,7 +18,7 @@ const computerChoice = (imgCoord) => {
     })[0];
 };
 
-class RSP extends Component {
+class RSP extends PureComponent {
     state = {
         result: '',
         imgCoord: rspCoords.바위,

@@ -104,7 +104,90 @@ onClickBtn = (choice) => () => {
 
 
 
-## Hooks...
-: Hooks는 lifecycle을 가지고 있지 않음.
-> 문제가 된다.
+### Hooks...
+: Hooks는 lifecycle을 가지고 있지 않음.\
+-> 흉내내기는 가능.\
+=> useEffect 사용
+## useEffect
+: useRef 처럼 함수 컴포넌트안에다가 적어줘야함.
+> componentDidMount, componentDidUpdate 같은 것들을 1:1 대응하면서 똑같은 느낌 X.
+>> 이러한 역할을 한다는 이야기.
+``` jsx
+useEffect(()=> { // componentDidMount,componentDidUpdate 역할
+        interval.current = setInterval(changeHand, 100);
+        return () => { // componentWillUnmount 역할
+            clearInterval(interval.current);
+        };
+},[]);
+```
+> 배열이 비었을 경우 : 처음에만 실행하고, 뭐가 바뀌든 다시 실행 X.
+>> componentDidMount 역할이 되는거네..
+>>> 배열에 값 넣으면 componentDidUpdate 역할
+: useEffect의 첫번째 인수 - 함수, 두번째 인수 - 배열\
+: 이 배열이 클로저 문제 같은 것들을 해결하게해준다.\
+: 바뀌는 state, useEffect를 실행하고 싶은 state를 배열에 넣어준다.
+> 두번째 인수인 배열에 넣은 값들이 바뀔 때 useEffect 실행.
+``` jsx
+useEffect(()=> { // componentDidMount,componentDidUpdate 역할
+        interval.current = setInterval(changeHand, 100);
+        return () => { // componentWillUnmount 역할
+            clearInterval(interval.current);
+        };
+},[imgCoord]);
+```
+함수 컴포넌트는 렌더링이 될 때마다 안에 값들이 통째로 다시 실행된다.
+그래서 렌더링 다시 될 때 마다 useEffect 부분이 계속 실행되는 것이다.
+ex) 위의 경우에는 매번 ```interval.current = setInterval(changeHand, 100);``` 실행 후 return값인 ```clearInterval(interval.current);```이 실행된다.
+=> 매번 clearInterval을 하기 때문에 그냥 setTimeout을 하는 것과 동일함.
+
+정리)) useEffect는 두번째 인수인 배열에 넣은 값이 바뀔 때마다 useEffect가 실행된다.\
+=> setInterval이 실행되었다가 clearInterval되었다가를 반복함.
+> 함수 컴포넌트는 렌더링이 될 때마다 안에 값들이 통째로 다시 실행된다는 특성 때문에 그러하다.
+>> 외우는게 더 나을 수도 있음,,,
+>>> Hooks에서 어려운 부분이 이부분,,,
+
+## useEffect 꿀팁
+: useEffect는 여러번 사용 가능
+> state 별로 다른 효과를 내고 싶을 수가 있으니까.
+>> Class의 경우 componentDidMount나 componentDidUpdate에서 모든 state를 조건문으로 분기 처리함.
+
+## 꿀팁
+- useLayoutEffect\
+: 레이아웃의 변화를 감지할 때 사용
+ex) 사이즈 변화를 줄 때(주기 직전에) 실행
+> useEffect는 사이즈 변화 주고나서 실행
+
+## 더 쉽게 설명하자면...
+state가 result, imgCoord, score가 있다고 하자.\
+- Class에서는\
+: componentDidMount, componentDidUpdate, componentWillUnmount 모두 result, imgCoord, score 접근(?)이 가능하다.
+``` jsx
+componentDidMount() {
+    this.setState({
+        imgCoord: 3,
+        score: 1,
+        result: 2,
+    })
+}
+```
+- Hooks에서는\
+: result에 useEffect 한개, imgCoord에 useEffect 한개, score에 useEffect 한개 접근이 가능
+> 물론 한 useEffect에서 여러개를 담당할 수 있다!
+>> 그니까 동작이 다르면 따로따로 해줘야한다는 말인거같당.
+``` jsx
+useEffect(() => {
+    setImgCoord();
+    setScore();
+    }, [imgCoord, score]);
+
+useEffect(() => {
+    setResult();
+    }, [result]);
+```
+<img src = './lifecycle.png'/>
+
+## 질문
+Q. setInterval은 꼭 여기 안에서만 사용해야하나요?\
+A. 아뇨. 필요할 때 맞춰서 다른 함수에 넣어도 괜찮. 하지만 setInterval을 사용했다면 componentWillUnmount에서 정리해주기 (clear)
+
 
