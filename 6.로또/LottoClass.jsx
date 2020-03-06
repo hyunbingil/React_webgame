@@ -12,22 +12,24 @@ function getWinNumbers() {
     }
     const bonusNumber = shuffle[shuffle.length - 1];
     const WinNumbers = shuffle.slice(0,6).sort((p,c) => p-c);
+    console.log(WinNumbers);
     return [...WinNumbers, bonusNumber];
 };
 
 class Lotto extends Component {
     state = {
-        WinNumbers: getWinNumbers(), // 당첨 숫자
+        winNumbers: getWinNumbers(), // 당첨 숫자
         winBalls: [], // 앞에 6개
         bonus: null, // 그 다음 7번째꺼
         redo: false, // 재실행
     };
 
     timeouts = [];
-    componentDidMount() {
-        //컴포넌트가 시작하자마자 뜨는거기 때문에 이거 사용.
-        const { winNumbers, winBalls } = this.state;
-        for (let i=0; i < winBalls.length - 1; i++) {
+
+    runTimeouts = () => {
+        const { winNumbers } = this.state;
+        console.log(winNumbers.length);
+        for (let i=0; i < winNumbers.length - 1; i++) {
             // let을 사용하면 클로저 문제 생기지 않는다.
             this.timeouts[i] = setTimeout(() => {
                 this.setState((prevState)=> {
@@ -39,19 +41,40 @@ class Lotto extends Component {
 
             }, (i+1) * 1000);
         }// 보너스 공 뺄려고 1빼준거
-        setTimeout(() => {
+        this.timeouts[6] = setTimeout(() => {
             this.setState({
                 bonus: winNumbers[6],
                 redo: true, // 한 번 더 버튼이 생긴다.
             });
-        }, 7000)
+        }, 7000);
     };
+
+    componentDidMount() {
+        //컴포넌트가 시작하자마자 뜨는거기 때문에 이거 사용.
+        this.runTimeouts();
+    };
+
+    componentDidUpdate(prevProps, prevState) { // 업데이트 하고 싶은 상황을 잘 처리해주어야한다.
+        if (this.timeouts.length === 0) { // 초기화가 되는 상태 (버튼을 눌렀을 때)
+          this.runTimeouts();
+        }
+      }
 
     componentWillUnmount() {
         this.timeouts.forEach((v) => {
             clearTimeout(v);
         });
     }; // 꼼꼼하게 챙겨주기
+
+    onClickRedo = () => {
+        this.setState ({
+            winNumbers: getWinNumbers(), // 당첨 숫자
+            winBalls: [], // 앞에 6개
+            bonus: null, // 그 다음 7번째꺼
+            redo: false, // 재실행
+        });
+        this.timeouts = [];
+    }
 
     render() {
         const { winBalls, bonus, redo } = this.state;
