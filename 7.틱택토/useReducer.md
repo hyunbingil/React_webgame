@@ -34,3 +34,43 @@ const TicTacToe = () => {
     )
 };
 ```
+
+### dispatch
+- dispatch 안에 들어가는 것 : action 객체\
+: dispatch하면 action을 실행한다고 생각하면 된다.
+> redux에서 따온 개념
+``` jsx
+const onClickTable = useCallback(() => {
+        dispatch({ type: 'SET_WINNER', winner: 'O'});
+    }, []);
+```
+- action은 어떤 역할을 하나?\
+: action만 있다고 해서 자동으로 state가 바뀌는 건 아니고 이 action을 해석해서 state를 직접 바꿔주는 역할이 필요한데...\
+: 이게 바로 reducer
+
+- action을 dispatch 할 때 마다 reducer가 실행된다.
+``` jsx
+const reducer = (state, action) => {
+    // state를 어떻게 바꿀지 적어준다.
+    switch(action.type) {
+        case 'SET_WINNER':
+            // state.winner = action.winner; 라고 직접 바꾸면 안된다.
+            return {
+                ...state, // spread로 얕은 복사
+                winner: action.winner,
+            };
+    }
+};
+```
+
+## 정리하자면...
+1. 처음 state가 있다.(ex)initialState)
+2. state를 바꾸고 싶으면 event가 실행될 때
+3. action을 만들어서
+4. action을 통해 dispatch를 해주어야한다.
+> 직접 state를 바꿀 수 없다.
+5. 이때, action을 어떻게 처리할지는 reducer가 관리,기록.
+<img src='./state변경방법.png'>
+
+## 꿀팁
+- action의 이름은 보통 대문자로 한다.
