@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useContext, memo } from 'react';
 import Tr from './Tr';
-const Table = ({tableData, dispatch}) => {
-    console.log(tableData.length);
-    return (
+import { TableContext } from './MineSearch';
 
-        <table>
-            {Array(tableData.length).fill().map((tr, i)=>(<Tr key={i} dispatch={dispatch} rowIndex={i} rowData={tableData[i]} />))}
-        </table>
-    );
-};
-
+const Table = memo(() => {
+  const { tableData } = useContext(TableContext);
+  return (
+    <table>
+      {Array(tableData.length).fill().map((tr, i) => <Tr rowIndex={i} />)}
+    </table>
+  )
+});
 export default Table;
