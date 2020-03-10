@@ -55,7 +55,7 @@ const {dispatch} = useContext(TableContext);
 ex) MineSearch가 새로 rerendering 될 때 마다 ```<TableContext.Provider value={{tableData: state.tableData, dispatch}}>```에서 value 안에 객체가 새로 생긴다.
 > context api를 사용하는 자식 컴포넌트 들도 계속 rerendering 되기 때문에 성능적으로 굉장히 좋지 않다.
 
-: 그래서 useMemo로 caching을 해주어야한다.
+: 그래서 useMemo로 value 값들은 caching을 해주어야한다. (중요)
 - useMemo로 객체값을 기억해준다.
 ``` jsx
 const MineSearch = () => {
@@ -86,3 +86,43 @@ const MineSearch = () => {
     >{getTdText(data)}</td>
 ```
 > 오른쪽 클릭시 메뉴 안나오게 하려면 ```e.preventDefault();``` 사용하기
+
+2. 뜬금없이 vs code 같은 단어 선택 ctrl + d
+
+## 지뢰 찾기 시 눌렀을 때 한방에 나오게 하려면...
+> 재귀를 사용해야한다.
+>> 재귀 잘못다루면 callstack 터지니까 조심..!
+~> 그래서 한 번 연칸은 cashing 해주어야한다.
+
+- 위, 아래가 없을 경우는 만들어 줘야한다.
+- 왜 왼쪽, 오른쪽이 없는 경우는 신경안쓰나?\
+: 왼쪽, 오른쪽이 없을 경우는 알아서 undefined가 되어서 filter를 적용시켰을 때 사라지기 때문이다.
+
+## useContext를 사용하면
+: 로직(?) 전체가 한번은 리렌더링 된다...\
+: 근데 return 부분이 계속 리렌더링 되는건 문제가 되기 때문에 해결해주어야함.\
+1. useMemo 사용하기
+``` jsx
+return useMemo(() => (
+    <td
+      style={getTdStyle(data)}
+      onClick={onClickTd}
+      onContextMenu={onRightClickTd}
+    >{getTdText(data)}</td>
+), [tableData[rowIndex][cellIndex]]);
+```
+2. 컴포넌트를 나눠서 memo 사용하기
+``` jsx
+// 위에는
+return <RealTd onClickTd={onClickTd} onRightClickTd={onRightClickTd} data={tableData[rowIndex][cellIndex]} />;
+// 작성하고
+const RealTd = memo(({ onClickTd, onRightClickTd, data}) => {
+  return (
+    <td
+      style={getTdStyle(data)}
+      onClick={onClickTd}
+      onContextMenu={onRightClickTd}
+    >{getTdText(data)}</td>
+  )
+});
+```
