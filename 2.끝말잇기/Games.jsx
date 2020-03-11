@@ -1,18 +1,23 @@
 import React from 'react';
-import {BrowserRouter, HashRouter, Route}from 'react-router-dom';
-import NumberBaseball from '../3.숫자야구/NumberBaseball';
-import RSP from '../5.가위바위보/RSP';
-import Lotto from '../6.로또/Lotto';
+import {BrowserRouter, HashRouter, Route, Link}from 'react-router-dom';
+import GameMatcher from './GameMatcher';
 
 const Games = memo(() => {
 
     return (
             <BrowserRouter>
             <div>
-                <Route path="/number-baseball" component={NumberBaseball} /> {/* 주소를 임의로 지정*/}
-                <Route path="/rock-scissors-paper" component={RSP} />
-                <Route path="/lotto-generator" component={Lotto} />
-            </div>
+            <Link to="/game/response-check">반응속도체크</Link>
+            &nbsp;
+            <Link to="/game/rock-scissors-paper">가위바위보</Link>
+            &nbsp;
+            <Link to="/game/lotto-generator">로또추첨기</Link>
+            &nbsp;
+            <Link to="/game/index">게임 매쳐</Link>
+            </div> {/* 공통인 부분 (레이아웃) */}
+            <div>
+                <Route path="/game/:name" component={GameMatcher} />
+            </div> {/* 바뀌는 부분 */}
             </BrowserRouter>
     );
 });
