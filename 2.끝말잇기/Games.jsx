@@ -16,7 +16,10 @@ const Games = memo(() => {
             <Link to="/game/index">게임 매쳐</Link>
             </div> {/* 공통인 부분 (레이아웃) */}
             <div>
-                <Route path="/game/:name" component={GameMatcher} />
+                <Switch>
+                    <Route exact path="/" render={(props) => <GameMatcher {...props} />} />
+                    <Route path="/game/:name" render={(props) => <GameMatcher {...props} />} />
+                </Switch>
             </div> {/* 바뀌는 부분 */}
             </BrowserRouter>
     );

@@ -176,6 +176,9 @@ export default class GameMatcher extends Component {
 
 __정리)__ history에는 눈속임을 위한 method 들이 들어있고, match는 동적 주소 라우팅할 때 params 부분에 대한 정보를 갖고 있고, lcoation은 이 주소에 대한 정보를 가지고 있음.
 
+> 함수 컴포넌트의 경우에는 props 자리에 들어있음.
+``` const Games = ({ match, location, history}) = > {} ```
+
 - Route에 연동되지 않은 컴포넌트에 이 props 들을 넣고 싶다?
 
 ## withRouter
@@ -223,6 +226,7 @@ React Router의 React에서의 역할, React Router의 웹사이트 개발시의
 <Link to="/game/response-check?query=10&goldenchild=jangjun&chicken=18000">반응속도체크</Link>
 ```
 : 쿼리 스트링은 props 중에 location안에 search에 있음.
+
 ### URLSearchParams 객체를 이용해서 실제로 활용할 수 있음
 ``` jsx
 let urlSearchParams = new URLSearchParams(this.props.location.search.slice(1));
@@ -230,3 +234,62 @@ console.log(urlSearchParams.get('goldenchild'));
 ```
 : 이런식으로 파싱(?), 분석을 따로 해주긴 해야한다.
 > 리액트 라우터에서 기본적으로 분석하는 것들을 제공 안해서 ㅠ
+
+### 해시
+: 쿼리 스트링 뒤에 #hungry=0\
+: 서버는 모르고 브라우저만 안다.
+> 많이 사용하지는 않음.
+
+## 상위 컴포넌트에서 하위 컴포넌트로 props 넘기기
+1. component 사용하기
+``` jsx
+<Route path="/game/:name" component={() => <GameMatcher props="12345"/>} />
+```
+> 이렇게 넘겨주기
+
+2. render 사용하기
+``` jsx
+<Route path="/game/:name" render={(props) => <GameMatcher props={props} />} />
+```
+
+## Route에서 같은 것이 여러개일 경우
+``` jsx
+<Route path="/game/:name" render={(props) => <GameMatcher {...props} />} /> // 동적
+<Route path="/game/response-check" render={(props) => <GameMatcher {...props} />} /> // 고정
+```
+> 두가지 다 받아버리기 때문에 화면에 두개가 뜬다
+>> 그렇다고 게임 화면이 두개 인건 아니고 하나는 게임 화면이고 하나는 '일치하는 게임X.'라고 뜸.
+
+### 해결방법
+- Switch 사용\
+: Route 중에서 첫번째로 일치하는 것만 사용.
+``` jsx
+<Switch>
+    <Route path="/game/:name" render={(props) => <GameMatcher {...props} />} />
+    <Route path="/game/response-check" render={(props) => <GameMatcher {...props} />} />
+</Switch>
+```
+> 뒤에 값들이 일치해도 렌더링 X.
+
+## Route에서 일치한다고 착각하는 경우
+``` jsx
+<Route path="/" render={(props) => <GameMatcher {...props} />} />
+<Route path="/game/:name" render={(props) => <GameMatcher {...props} />} />
+```
+> 상위 주소도 일치한다고 생각해서 두가지 다 받아버리기 때문에 화면에 두개가 뜬다
+>> 그렇다고 게임 화면이 두개 인건 아니고 하나는 게임 화면이고 하나는 '일치하는 게임X.'라고 뜸.
+
+### 해결방법
+> switch 사용해도 해결 X.
+- exact 사용\
+: 정확하게 이 주소와 일치하는 경우에만 사용
+``` jsx
+<Switch>
+<Route exact path="/" render={(props) => <GameMatcher {...props} />} />
+<Route path="/game/:name" render={(props) => <GameMatcher {...props} />} />
+</Switch>
+```
+
+https://reacttraining.com/react-router/web/example/basic
+> 만들고 싶은 프로젝트에 reat-router 코드를 어떻게, 어떨 때 적용할 수 있을지 생각하면서 쭉 읽어보기.
+>> 실무에 필요한 것들이 소개 되어있다. 특히, guides에
