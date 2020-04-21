@@ -9,6 +9,7 @@
   "author": "hyunbingil",
   "license": "MIT",
   "dependencies": {
+    "minimist": "^1.2.5",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-router": "^5.1.2",
